@@ -1,0 +1,244 @@
+#Excercise 5
+
+setwd("/Users/swastik/Desktop/AMMA 2017/Data/data_2017")
+emp_fle <- read.csv("/Users/swastik/Desktop/AMMA 2017/Data/data_2017/Emp.csv")
+dept_fle <- read.csv("/Users/swastik/Desktop/AMMA 2017/Data/data_2017/Dept.csv")
+
+emp_df<- data.frame(emp_fle)
+dept_df<- data.frame(dept_fle)
+View(dept_df)
+View(emp_df)
+merged_table<-merge(emp_df,dept_df, by=c("DEPTNO"), all = TRUE)
+View(merged_table)
+tot_sal_lon<-0
+tot_sal_par<-0
+tot_sal_nw<-0
+tot_sal_tok<-0
+cnt_lon<-0
+cnt_par<-0
+cnt_nw<-0
+cnt_tok<-0
+for(i in 1:nrow(merged_table))
+{
+  if(!is.na(merged_table$LOC[i]))
+  {
+  if(merged_table$LOC[i]=="LONDON")
+  {
+   cnt_lon=cnt_lon+1 
+   tot_sal_lon<- tot_sal_lon + merged_table$SAL[i]
+  }
+    else if(merged_table$LOC[i]=="TOKYO")
+    {
+      cnt_tok=cnt_tok+1
+      tot_sal_tok<- tot_sal_tok + merged_table$SAL[i]
+    }
+    else if(merged_table$LOC[i]=="NEW YORK")
+    {
+      cnt_nw=cnt_nw+1
+      tot_sal_nw<- tot_sal_nw + merged_table$SAL[i] 
+    }
+    else
+    {
+      cnt_par=cnt_par+1
+      tot_sal_par<- tot_sal_par + merged_table$SAL[i] 
+    }
+  }
+}
+#Calculating Average Salary Based on Location
+avrg_sal_lon <- tot_sal_lon/cnt_lon
+avrg_sal_tok <- tot_sal_tok/cnt_tok
+avrg_sal_nw <- tot_sal_nw/cnt_nw
+avrg_sal_par <- tot_sal_par/cnt_par
+
+#3rd part
+req_dataset<- data.frame("MANAGER"=  merged_table$MGR,"EMP_NAME"= merged_table$ENAME)
+View(req_dataset)
+cnt_7782<-0
+cnt_7839<-0
+cnt_7566<-0
+cnt_7788<-0
+cnt_7902<-0
+cnt_7698<-0
+
+for(k in 1:nrow(req_dataset))
+{
+  if(!is.na(req_dataset$MANAGER[k])) 
+  {
+    if(req_dataset$MANAGER[k]==7782)
+    {
+      cnt_7782<-cnt_7782+1
+    }
+    else if(req_dataset$MANAGER[k]==7839)
+    {
+      cnt_7839<-cnt_7839+1
+    }
+    else if(req_dataset$MANAGER[k]==7566)
+    {
+      cnt_7566<-cnt_7566+1
+    }
+    else if(req_dataset$MANAGER[k]==7788)
+    {
+      cnt_7788<-cnt_7788+1
+    }
+    else if(req_dataset$MANAGER[k]==7902)
+    {
+      cnt_7902<-cnt_7902+1
+    }
+    else if(req_dataset$MANAGER[k]==7698)
+    {
+      cnt_7698<-cnt_7698+1
+    }
+  }
+}
+print("The highest number in a manager is=")
+print(7698)
+
+#Part 4
+merged_table$INC_SAL<-0
+for(j in 1:nrow(merged_table))
+{
+  if(!is.na(merged_table$JOB[j])) 
+  {
+    if(merged_table$JOB[j]=="ANALYST")
+    {
+      merged_table$INC_SAL[j] <- merged_table$SAL[j] + (0.15 * merged_table$SAL[j])
+    }
+    else if(merged_table$JOB[j]=="CLERK")
+    {
+      merged_table$INC_SAL[j] <- merged_table$SAL[j] + (0.125 * merged_table$SAL[j])
+    }
+    else if(merged_table$JOB[j]=="MANAGER")
+    {
+      merged_table$INC_SAL[j] <- merged_table$SAL[j] + (0.102 * merged_table$SAL[j])
+    }
+    else if(merged_table$JOB[j]=="PRESIDENT")
+    {
+      merged_table$INC_SAL[j] <- merged_table$SAL[j] + (0.057 * merged_table$SAL[j])
+    }
+    else if(merged_table$JOB[j]=="SALESMAN")
+    {
+      merged_table$INC_SAL[j] <- merged_table$SAL[j] + (0.133 * merged_table$SAL[j])
+    }
+  }
+}
+View(merged_table)
+
+#Excercise 6
+
+cricket_data<- read_html("http://stats.espncricinfo.com/ci/content/records/284248.html")
+tables<-html_nodes(cricket_data, "table")
+table1 <- html_table(tables[1], fill = TRUE)
+View(table1)
+cricket_df<- as.data.frame(table1)
+View(cricket_df)
+cricket_df[with(cricket_df, order(Runs, Player)), ]
+cricket_df$Runs
+TopFive_Runs<-c(cricket_df$Runs[1], cricket_df$Runs[2], cricket_df$Runs[3], cricket_df$Runs[4], cricket_df$Runs[5])
+View(TopFive_Runs)
+
+Top.Five_df <- NULL
+Top.Five_df$HS<- cricket_df$Runs[1:5]
+Top.Five_df$Year<- cricket_df$Year[1:5]
+
+plot(Top.Five_df$Year, Top.Five_df$Runs)
+
+
+yearsort<- cricket_df[with(cricket_df, order(Year, Player)), ]
+View(yearsort)
+
+yearscore.df<- as.data.frame(table(cricket_df$Year))
+yearscore.df$MaxRuns <- rep(0,nrow(yearscore.df))
+yearscore.df$MaxRunsPlayer <- rep("",nrow(yearscore.df))
+for(i3 in 1:nrow(yearscore.df))
+{
+  
+  maxRuns<- subset(cricket_df,cricket_df$Year==yearscore.df$Var1[i3])
+  yearscore.df$MaxRuns[i3] <- max(maxRuns$Runs)
+}
+
+for (i4 in 1:nrow(yearscore.df))
+{
+  for (i5 in 1:nrow(cricket.df))
+  {
+    if(cricket_df$Year[i5]==yearscore.df$Var1[i4] && cricket_df$Runs[i5]==yearscore.df$MaxRuns[i4])
+      yearscore.df$MaxRunsPlayer[i4] <- cricket_df$Player[i5]
+  }  
+  
+}
+
+playerMaxRunsTable <- as.data.frame(table(yearscore.df$MaxRunsPlayer))
+max(playerMaxRunsTable$Freq)
+
+print(playerMaxRunsTable)
+print("Maximum number of times a player has got the highest number of runs in a year")
+print(max(playerMaxRunsTable$Freq))
+
+
+PAK=0
+AUS=0
+IND=0
+SL=0
+ENG=0
+WI=0
+SA=0
+
+for(i in 1:length(cricket_df$Player))
+{
+  if(grepl("PAK",cricket_df$Player[i]))
+    PAK=PAK+1
+}
+
+View(PAK)
+
+for(i in 1:length(cricket_df$Player))
+{
+  if(grepl("AUS",cricket_df$Player[i]))
+    AUS=AUS+1
+}
+
+View(AUS)
+for(i in 1:length(cricket_df$Player))
+{
+  if(grepl("INDIA",cricket_df$Player[i]))
+    IND=IND+1
+}
+
+View(IND)
+for(i in 1:length(cricket_df$Player))
+{
+  if(grepl("SL",cricket_df$Player[i]))
+    SL=SL+1
+}
+
+View(SL)
+for(i in 1:length(cricket_df$Player))
+{
+  if(grepl("ENG",cricket_df$Player[i]))
+    ENG=ENG+1
+}
+
+View(ENG)
+for(i in 1:length(cricket_df$Player))
+{
+  if(grepl("WI",cricket_df$Player[i]))
+    WI=WI+1
+}
+
+View(WI)
+for(i in 1:length(cricket_df$Player))
+{
+  if(grepl("SA",cricket_df$Player[i]))
+    SA=SA+1
+}
+
+View(SA)
+
+Total_appearances = PAK + AUS + IND + WI + ENG + SA + SL
+
+PAK_ratio = round(100*PAK/Total_appearances,2)
+AUS_ratio = round(100*AUS/Total_appearances,2)
+IND_ratio = round(100*IND/Total_appearances,2)
+SL_ratio = round(100*SL/Total_appearances,2)
+WI_ratio = round(100*WI/Total_appearances,2)
+ENG_ratio = round(100*ENG/Total_appearances,2)
+SA_ratio = round(100*SA/Total_appearances,2)
